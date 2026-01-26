@@ -1,17 +1,16 @@
- apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: example-ingress
 spec:
-  ingressClassName: nginx
   rules:
-    - host: myservice.info
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: myservice
-                port:
-                  number: 8080
+  - host: myservice.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myservice
+            port:
+              number: 8080
