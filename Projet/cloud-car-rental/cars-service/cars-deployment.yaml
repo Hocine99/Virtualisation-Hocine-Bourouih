@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cars-deployment
+  labels:
+    app: cars-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cars-service
+  template:
+    metadata:
+      labels:
+        app: cars-service
+    spec:
+      containers:
+        - name: cars-container
+          image: hocinebour/cars-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
