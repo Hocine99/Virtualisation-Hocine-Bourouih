@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloud Car Rental</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-card: #0f172a;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --border-radius: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 40%, #000 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1120px;
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.05), rgba(15, 23, 42, 0.95));
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 28px 26px 30px;
+      backdrop-filter: blur(18px);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 118, 110, 0.3));
+      color: #a5f3fc;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.96));
+      border-radius: var(--border-radius);
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.85);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .list {
+      margin-top: 10px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+    }
+
+    .list-item {
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .list-item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .status-available {
+      border-color: rgba(74, 222, 128, 0.65);
+      color: var(--success);
+    }
+
+    .status-rented {
+      border-color: rgba(248, 113, 113, 0.7);
+      color: var(--danger);
+    }
+
+    /* Formulaire */
+    .form {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    input {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      padding: 6px 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      color: #f9fafb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.95);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .status-bar {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 18px;
+    }
+
+    .status-bar span.ok {
+      color: var(--success);
+    }
+
+    .status-bar span.error {
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <div class="title">
+          Cloud Car Rental
+          <span class="badge">k8s · docker · postgres · microservices</span>
+        </div>
+        <p class="subtitle">
+          Tableau de bord minimaliste pour votre projet de location de voitures :
+          services REST, base PostgreSQL et Ingress Kubernetes.
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <!-- Colonne gauche : voitures -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Parc de voitures</div>
+          <span class="chip" id="cars-count">0 véhicules</span>
+        </div>
+        <div class="list" id="cars-list">
+          <!-- Rempli en JS -->
+        </div>
+      </section>
+
+      <!-- Colonne droite : locations + formulaire -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Locations</div>
+          <span class="chip" id="rentals-count">0 locations</span>
+        </div>
+        <div class="list" id="rentals-list">
+          <!-- Rempli en JS -->
+        </div>
+
+        <form class="form" id="rental-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customer">Client</label>
+              <input id="customer" name="customer" type="text" placeholder="Nom du client" required />
+            </div>
+            <div class="form-group">
+              <label for="carId">ID voiture</label>
+              <input id="carId" name="carId" type="number" min="1" step="1" placeholder="1" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Début</label>
+              <input id="startDate" name="startDate" type="date" required />
+            </div>
+            <div class="form-group">
+              <label for="endDate">Fin</label>
+              <input id="endDate" name="endDate" type="date" required />
+            </div>
+          </div>
+          <div class="form-row" style="grid-template-columns: 1fr;">
+            <button type="submit">Créer une location</button>
+          </div>
+          <div class="status-bar" id="form-status"></div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const carsListEl = document.getElementById('cars-list');
+    const rentalsListEl = document.getElementById('rentals-list');
+    const carsCountEl = document.getElementById('cars-count');
+    const rentalsCountEl = document.getElementById('rentals-count');
+    const rentalForm = document.getElementById('rental-form');
+    const statusEl = document.getElementById('form-status');
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      return dateStr.slice(0, 10);
+    }
+
+    async function loadCars() {
+      try {
+        const res = await fetch('/cars');
+        const cars = await res.json();
+        carsCountEl.textContent = `${cars.length} véhicule${cars.length > 1 ? 's' : ''}`;
+        carsListEl.innerHTML = '';
+        cars.forEach(car => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <div class="list-item-main">
+              <div class="pill">
+                <span class="pill-dot"></span>
+                #${car.id} · ${car.brand} ${car.model}
+              </div>
+              <div class="meta">
+                Plaque: <strong>${car.plateNumber}</strong>
+              </div>
+            </div>
+            <div class="status ${car.rented ? 'status-rented' : 'status-available'}">
+              ${car.rented ? 'Louée' : 'Disponible'}
+            </div>
+          `;
+          carsListEl.appendChild(item);
+        });
+      } catch (e) {
+        carsListEl.innerHTML = '<div class="meta">Impossible de charger les voitures.</div>';
+      }
+    }
+
+    async function loadRentals() {
+      try {
+        const res = await fetch('/rentals');
+        const rentals = await res.json();
+        rentalsCountEl.textContent = `${rentals.length} location${rentals.length > 1 ? 's' : ''}`;
+        rentalsListEl.innerHTML = '';
+        rentals.forEach(r => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <div class="list-item-main">
+              <div class="pill">
+                <span class="pill-dot"></span>
+                ${r.customer}
+              </div>
+              <div class="meta">
+                Voiture ID: <strong>${r.carId}</strong> · 
+                Du <strong>${formatDate(r.startDate)}</strong> 
+                au <strong>${formatDate(r.endDate)}</strong>
+              </div>
+            </div>
+          `;
+          rentalsListEl.appendChild(item);
+        });
+      } catch (e) {
+        rentalsListEl.innerHTML = '<div class="meta">Impossible de charger les locations.</div>';
+      }
+    }
+
+    rentalForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = 'Création en cours...';
+      statusEl.className = 'status-bar';
+
+      const body = {
+        customer: rentalForm.customer.value.trim(),
+        carId: Number(rentalForm.carId.value),
+        startDate: rentalForm.startDate.value,
+        endDate: rentalForm.endDate.value
+      };
+
+      try {
+        const res = await fetch('/rentals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          statusEl.innerHTML = `<span class="error">${data.error || 'Erreur lors de la création de la location.'}</span>`;
+        } else {
+          statusEl.innerHTML = `<span class="ok">Location #${data.id} créée avec succès.</span>`;
+          rentalForm.reset();
+          await loadRentals();
+        }
+      } catch (e) {
+        statusEl.innerHTML = `<span class="error">Erreur réseau, réessayez.</span>`;
+      }
+    });
+
+    // Chargement initial
+    loadCars();
+    loadRentals();
+  </script>
+</body>
+</html>

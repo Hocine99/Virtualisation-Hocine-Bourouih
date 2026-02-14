@@ -12,6 +12,7 @@ RUN npm install --only=production
 
 # Copier le code de l'application
 COPY app.js ./
+COPY public ./public
 
 # Le service écoute sur le port 3000
 ENV PORT=3000

@@ -2,8 +2,19 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const path = require('path');
+
 
 app.use(express.json());
+
+// Servir les fichiers statiques du front
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route explicite pour l'UI
+app.get('/ui', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 // Données en mémoire pour l'instant (on branchera PostgreSQL plus tard)
 let cars = [
