@@ -278,6 +278,27 @@
     .status-bar span.error {
       color: var(--danger);
     }
+
+    .btn-delete {
+      background: rgba(249, 115, 115, 0.2);
+      border: 1px solid rgba(249, 115, 115, 0.5);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      color: var(--danger);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.15s ease;
+    }
+
+    .btn-delete:hover {
+      background: rgba(249, 115, 115, 0.35);
+      transform: scale(1.08);
+    }
   </style>
 </head>
 <body>
@@ -411,13 +432,35 @@
                 au <strong>${formatDate(r.endDate)}</strong>
               </div>
             </div>
+            <button class="btn-delete" data-rental-id="${r.id}" title="Supprimer">×</button>
           `;
           rentalsListEl.appendChild(item);
+        });
+        
+        // Gérer les clics sur les boutons supprimer
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const rentalId = e.target.getAttribute('data-rental-id');
+            if (!confirm(`Supprimer la location #${rentalId} ?`)) return;
+            
+            try {
+              const res = await fetch(`/rentals/${rentalId}`, { method: 'DELETE' });
+              if (res.ok) {
+                await loadRentals();
+                await loadCars();
+              } else {
+                alert('Erreur lors de la suppression');
+              }
+            } catch (err) {
+              alert('Erreur réseau');
+            }
+          });
         });
       } catch (e) {
         rentalsListEl.innerHTML = '<div class="meta">Impossible de charger les locations.</div>';
       }
     }
+
 
     rentalForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -445,6 +488,7 @@
           statusEl.innerHTML = `<span class="ok">Location #${data.id} créée avec succès.</span>`;
           rentalForm.reset();
           await loadRentals();
+          await loadCars();
         }
       } catch (e) {
         statusEl.innerHTML = `<span class="error">Erreur réseau, réessayez.</span>`;

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: rental-container
-          image: hocinebour/rental-service:v4
+          image: hocinebour/rental-service:v5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4000

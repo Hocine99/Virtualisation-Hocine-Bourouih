@@ -138,6 +138,47 @@ app.post('/rentals', async (req, res) => {
   res.status(201).json(newRental);
 });
 
+// Supprimer une location
+app.delete('/rentals/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  
+  try {
+    // 1) Récupérer la location pour avoir le carId
+    const result = await pool.query(
+      'SELECT car_id AS "carId" FROM rentals WHERE id = $1',
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    
+    const carId = result.rows[0].carId;
+    
+    // 2) Supprimer la location
+    await pool.query('DELETE FROM rentals WHERE id = $1', [id]);
+    
+    // 3) Libérer la voiture dans cars-service
+    try {
+      const returnResponse = await fetch(`http://cars-service:3000/cars/${carId}/return`, {
+        method: 'PUT'
+      });
+      if (returnResponse.ok) {
+        console.log(`Car ${carId} marked as available in cars-service`);
+      } else {
+        console.warn(`Could not mark car ${carId} as available: ${returnResponse.status}`);
+      }
+    } catch (err) {
+      console.warn('Error calling cars-service /return:', err);
+    }
+    
+    res.json({ message: 'Rental deleted', id });
+  } catch (err) {
+    console.error('Error deleting rental:', err);
+    res.status(500).json({ error: 'Failed to delete rental' });
+  }
+});
+
 
 
 app.listen(port, () => {
