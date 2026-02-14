@@ -1,6 +1,8 @@
 // rental-service/app.js
 const express = require('express');
 const { Pool } = require('pg');
+const fetch = require('node-fetch');
+
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -65,6 +67,25 @@ app.post('/rentals', async (req, res) => {
     return res.status(400).json({ error: 'Missing fields' });
   }
 
+  // 1) Vérifier que la voiture existe via cars-service
+  try {
+    const carResponse = await fetch(`http://cars-service:3000/cars/${carId}`);
+    if (!carResponse.ok) {
+      if (carResponse.status === 404) {
+        return res.status(400).json({ error: `Car with id ${carId} does not exist` });
+      }
+      console.error('Error from cars-service:', carResponse.status, await carResponse.text());
+      return res.status(502).json({ error: 'Failed to validate car with cars-service' });
+    }
+
+    const car = await carResponse.json();
+    console.log('Car validated from cars-service:', car);
+  } catch (err) {
+    console.error('Error calling cars-service:', err);
+    return res.status(502).json({ error: 'Could not reach cars-service' });
+  }
+
+  // 2) Si tout est OK, insérer la location en base
   try {
     const result = await pool.query(
       `INSERT INTO rentals (customer, car_id, start_date, end_date)
@@ -78,6 +99,7 @@ app.post('/rentals', async (req, res) => {
     res.status(500).json({ error: 'Failed to create rental' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`rental-service listening on port ${port}`);
