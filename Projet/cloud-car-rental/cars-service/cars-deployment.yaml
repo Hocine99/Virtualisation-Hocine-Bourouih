@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: cars-container
-          image: hocinebour/cars-service:v2
+          image: hocinebour/cars-service:v3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

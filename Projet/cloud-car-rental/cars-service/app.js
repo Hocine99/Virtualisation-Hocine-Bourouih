@@ -71,6 +71,29 @@ app.put('/cars/:id/return', (req, res) => {
   res.json(car);
 });
 
+// Marquer une voiture comme louée
+app.put('/cars/:id/rent', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const car = cars.find(c => c.id === id);
+  if (!car) {
+    return res.status(404).json({ error: 'Car not found' });
+  }
+  car.rented = true;
+  res.json(car);
+});
+
+// Marquer une voiture comme disponible (bonus pour quand une location se termine)
+app.put('/cars/:id/return', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const car = cars.find(c => c.id === id);
+  if (!car) {
+    return res.status(404).json({ error: 'Car not found' });
+  }
+  car.rented = false;
+  res.json(car);
+});
+
+
 app.listen(port, () => {
   console.log(`cars-service listening on port ${port}`);
 });

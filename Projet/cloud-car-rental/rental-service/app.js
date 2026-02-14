@@ -85,7 +85,27 @@ app.post('/rentals', async (req, res) => {
     return res.status(502).json({ error: 'Could not reach cars-service' });
   }
 
-  // 2) Si tout est OK, insérer la location en base
+  // 2) Vérifier qu'il n'y a pas de conflit de dates pour cette voiture
+  try {
+    const conflictCheck = await pool.query(
+      `SELECT id FROM rentals 
+       WHERE car_id = $1 
+         AND start_date <= $3 
+         AND end_date >= $2`,
+      [carId, startDate, endDate]
+    );
+    if (conflictCheck.rows.length > 0) {
+      return res.status(400).json({ 
+        error: `Car ${carId} is already rented during this period` 
+      });
+    }
+  } catch (err) {
+    console.error('Error checking date conflicts:', err);
+    return res.status(500).json({ error: 'Failed to check availability' });
+  }
+
+  // 3) Insérer la location en base
+  let newRental;
   try {
     const result = await pool.query(
       `INSERT INTO rentals (customer, car_id, start_date, end_date)
@@ -93,12 +113,31 @@ app.post('/rentals', async (req, res) => {
        RETURNING id, customer, car_id AS "carId", start_date AS "startDate", end_date AS "endDate"`,
       [customer, carId, startDate, endDate]
     );
-    res.status(201).json(result.rows[0]);
+    newRental = result.rows[0];
   } catch (err) {
     console.error('Error creating rental:', err);
-    res.status(500).json({ error: 'Failed to create rental' });
+    return res.status(500).json({ error: 'Failed to create rental' });
   }
+
+  // 4) Marquer la voiture comme louée dans cars-service
+  try {
+    const rentResponse = await fetch(`http://cars-service:3000/cars/${carId}/rent`, {
+      method: 'PUT'
+    });
+    if (rentResponse.ok) {
+      console.log(`Car ${carId} marked as rented in cars-service`);
+    } else {
+      console.warn(`Could not mark car ${carId} as rented: ${rentResponse.status}`);
+      // On ne bloque pas la création, la location est déjà en base
+    }
+  } catch (err) {
+    console.warn('Error calling cars-service /rent:', err);
+    // Pas bloquant non plus
+  }
+
+  res.status(201).json(newRental);
 });
+
 
 
 app.listen(port, () => {
