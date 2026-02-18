@@ -51,7 +51,7 @@ Utilisateur → Ingress NGINX → cars-service (port 3000) → Interface Web
 ```bash
 git clone https://github.com/Hocine99/Virtualisation-Hocine-Bourouih.git
 cd projet
-cd cloud-car-rental
+cd Virtualisation-Hocine-Bourouih/Projet/cloud-car-rental
 ```
 
 ### 2. Démarrer minikube
