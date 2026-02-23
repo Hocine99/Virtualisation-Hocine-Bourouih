@@ -50,12 +50,12 @@ Utilisateur → Ingress NGINX → cars-service (port 3000) → Interface Web
 ### 1. Cloner le projet
 ```bash
 git clone https://github.com/Hocine99/Virtualisation-Hocine-Bourouih.git
-cd projet
 cd Virtualisation-Hocine-Bourouih/Projet/cloud-car-rental
 ```
 
 ### 2. Démarrer minikube
 ```bash
+minikube delete --all --purge
 minikube start
 minikube addons enable ingress
 ```
@@ -118,14 +118,6 @@ curl http://127.0.0.1/cars
 
 # Liste des locations
 curl http://127.0.0.1/rentals
-
-# Créer une location
-curl -X POST http://127.0.0.1/rentals \
-  -H "Content-Type: application/json" \
-  -d '{"customer":"Charlie","carId":1,"startDate":"2026-03-01","endDate":"2026-03-05"}'
-
-# Supprimer une location
-curl -X DELETE http://127.0.0.1/rentals/1
 ```
 
 ### Vérifier la base de données
